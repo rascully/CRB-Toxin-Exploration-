@@ -13,22 +13,17 @@ pCode <- c("00662","00665")
 phOR <- readNWISdata(stateCd="OR", parameterCd=pCode,
                      service="site", seriesCatalogOutput=TRUE)
 
-m <- phOR%>% 
-  leaflet() %>%
-  addTiles() %>%
-  addCircles(lng=~dec_long_va, lat= ~dec_lat_va, color="red") 
-
-m
 
 #finding WQPs sites in Oregon 
-type= "Stream"
-sitesOR <- whatWQPsites(stateCd="OR", siteType=type)
-
- 
+sitesOR <- whatWQPsites(stateCd="OR")
 write.csv(sitesOR, file = "data/ORSites.csv")
-metrics <- whatWQPmetrics(stateCd = "OR", siteType=type)
-sitesWA <- whatWQPsites(stateCd="WA", siteType=type)
-sitesID <- whatWQPsites(stateCd="ID", siteType=type)
+
+sitesWA <- whatWQPsites(stateCd="WA")
+sitesID <- whatWQPsites(stateCd="ID")
+
+sitesOR$VerticalMeasure.MeasureValue <- as.character(sitesOR$VerticalMeasure.MeasureValue)
+sitesID$VerticalMeasure.MeasureValue <- as.character(sitesID$VerticalMeasure.MeasureValue)
+
 
 sitesPNW <- bind_rows(sitesOR, sitesWA)
 sitesPNW <- bind_rows(sitesPNW,sitesID)
@@ -41,8 +36,12 @@ unique_Orginizations <- sitesPNW %>%
 
 write.csv(unique_Orginizations, file = "data/Unique_Organization.csv")
 
+
+#Create a map 
 m <- sitesPNW%>% 
   leaflet() %>%
   addTiles() %>%
-  addCircles(lng=~as.double(LongitudeMeasure), lat= ~as.double(LatitudeMeasure), color="red") 
+  addCircles(lng=~as.double(LongitudeMeasure), lat= ~as.double(LatitudeMeasure), color="blue") 
 m
+
+metrics <- whatWQPmetrics(stateCd = "OR")
